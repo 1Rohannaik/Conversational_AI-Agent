@@ -11,7 +11,6 @@ from PyPDF2.errors import PdfReadError
 from services.rag_pipeline import astore_embeddings
 from dotenv import load_dotenv
 from utils.cloudinary import ensure_configured as ensure_cloudinary_config
-from utils.cloudinary import config_status as cloudinary_config_status_util
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
@@ -81,8 +80,3 @@ async def upload_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)
         "url": pdf_record.cloud_url,
         "message": "PDF uploaded and embeddings stored successfully",
     }
-
-
-@router.get("/config_status")
-def cloudinary_config_status():
-    return cloudinary_config_status_util()

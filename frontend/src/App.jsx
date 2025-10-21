@@ -50,8 +50,8 @@ function App() {
         )}
       </div>
 
-      {/* Bottom controls: Upload and Mic */}
-      <div className="pb-4 flex items-center gap-4">
+      {/* Bottom controls: Upload (left) and Mic (right) */}
+      <div className="w-full pb-4 flex items-center justify-between">
         <UploadButton
           onUploaded={(res) => {
             setFileId(res.id)

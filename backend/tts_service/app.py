@@ -17,7 +17,3 @@ async def tts_endpoint(req: TTSRequest):
         os.remove(tmp.name)
 
     return FileResponse(out_path, media_type="audio/mpeg", filename="speech.mp3")
-
-
-async def health():
-    return {"status": "ok", "service": "tts-gtts", "version": "1.0.0"}

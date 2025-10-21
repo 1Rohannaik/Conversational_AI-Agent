@@ -27,13 +27,3 @@ def ensure_configured() -> None:
             "Cloudinary is not configured: set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET in env"
         )
 
-
-def config_status() -> dict:
-    _configure_from_env()
-    cfg = cloudinary.config()
-    return {
-        "cloud_name_set": bool(cfg.cloud_name),
-        "api_key_set": bool(cfg.api_key),
-        "secure": bool(getattr(cfg, "secure", False)),
-    }
-

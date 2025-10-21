@@ -45,7 +45,7 @@ export default function UploadButton({ onUploaded, onError, className = '' }) {
         aria-label="Upload PDF"
         title="Upload PDF"
         className={[
-          'group relative size-14 md:size-20 rounded-full',
+          'group relative size-10 md:size-20 rounded-full',
           'bg-gradient-to-br from-green-500/25 via-emerald-500/20 to-teal-500/25 hover:from-green-500/35 hover:via-emerald-500/30 hover:to-teal-500/35',
           'border border-green-400/60 shadow-lg shadow-green-500/20',
           'transition-all duration-500 ease-out outline-none focus-visible:ring-2 focus-visible:ring-green-400/40 transform-gpu',

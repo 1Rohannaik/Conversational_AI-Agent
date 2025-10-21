@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from contextlib import contextmanager
 from typing import Generator
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 
@@ -32,10 +32,3 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
-
-
-def ping() -> bool:
-    """Quick DB connectivity check."""
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
-    return True

@@ -44,7 +44,7 @@ export default function MicButton({ active = false, thinking = false, onPress })
         active ? 'Stop listening' : 'Start listening'
       }
       className={[
-        'group relative size-14 md:size-20 rounded-full',
+        'group relative size-10 md:size-20 rounded-full',
         style.bg,
         style.border,
         'transition-all duration-500 ease-out outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 transform-gpu',

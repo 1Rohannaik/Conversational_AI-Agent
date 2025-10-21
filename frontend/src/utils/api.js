@@ -65,22 +65,7 @@ export async function uploadPdf(file) {
   }
 }
 
-// QA
-export async function qaAsk(fileId, question) {
-  const res = await fetch(`${getBaseUrl()}/qa/ask`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ file_id: Number(fileId), question }),
-  })
-  return handleResponse(res)
-}
-
-export async function qaStatus(fileId) {
-  const res = await fetch(`${getBaseUrl()}/qa/status/${encodeURIComponent(fileId)}`)
-  return handleResponse(res)
-}
-
-// Flow (intent: rag/quiz/summary/interview)
+// Flow (intent: rag/quiz/summary)
 export async function flowAsk(fileId, question, conversationSessionId = null) {
   const body = { file_id: Number(fileId), question }
   if (conversationSessionId) {
@@ -95,29 +80,7 @@ export async function flowAsk(fileId, question, conversationSessionId = null) {
   return handleResponse(res)
 }
 
-// Interactive Interview
-export async function interviewStart({ fileId, numQuestions = 5, focus, level }) {
-  const res = await fetch(`${getBaseUrl()}/interview/start`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ file_id: Number(fileId), num_questions: numQuestions, focus, level }),
-  })
-  return handleResponse(res)
-}
 
-export async function interviewAnswer({ sessionId, answer }) {
-  const res = await fetch(`${getBaseUrl()}/interview/answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId, answer }),
-  })
-  return handleResponse(res)
-}
-
-export async function interviewStatus(sessionId) {
-  const res = await fetch(`${getBaseUrl()}/interview/status/${encodeURIComponent(sessionId)}`)
-  return handleResponse(res)
-}
 
 // STT (Groq Whisper)
 export async function sttTranscribe(file) {
@@ -149,12 +112,7 @@ export function playAudioBlob(blob) {
 export default {
   getBaseUrl,
   uploadPdf,
-  qaAsk,
-  qaStatus,
   flowAsk,
-  interviewStart,
-  interviewAnswer,
-  interviewStatus,
   sttTranscribe,
   ttsSynthesize,
   playAudioBlob,
