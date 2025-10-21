@@ -1,0 +1,47 @@
+fastapi==0.115.6
+uvicorn==0.30.6
+pydantic==2.12.3
+gTTS==2.5.4
+groq==0.32.0
+python-multipart==0.0.20
+httpx==0.27.2
+python-dotenv==1.0.1
+PyPDF2==3.0.1
+
+# DB & ORM
+SQLAlchemy==2.0.35
+cryptography==43.0.1
+greenlet==3.1.1
+mysql-connector-python==9.0.0
+
+# Cloudinary
+cloudinary==1.41.0
+
+# Queue & Telephony
+celery==5.4.0
+redis==5.0.8
+twilio==9.3.8
+
+# RAG & NLP
+langchain==0.3.7
+langchain-community==0.3.7
+langgraph==0.2.45
+chromadb==0.5.11
+dateparser==1.2.0
+python-dateutil==2.9.0.post0
+langchain-google-genai==2.1.5
+google-ai-generativelanguage==0.6.18
+sentence-transformers==2.7.0
+
+# Notes:
+# - This project’s code imports mainly FastAPI, Pydantic, gTTS, Groq, and relies on uvicorn to run.
+# - python-multipart is required by FastAPI for file uploads (STT endpoint).
+# - FFmpeg is optional (for speed adjustment); it’s a system package, not pip.
+# - If you later add Whisper/Torch/etc., re-add those packages as needed.
+
+# Dependency notes:
+# - We use `langchain-google-genai` to access Gemini via LangChain; you do NOT need
+#   the `google-generativeai` SDK directly. Keeping both can cause a resolver
+#   conflict around `google-ai-generativelanguage` versions. If you previously
+#   installed `google-generativeai`, uninstall it in your venv:
+#     pip uninstall -y google-generativeai

@@ -1,0 +1,27 @@
+/* stylelint-disable-next-line */
+@tailwind base;
+/* stylelint-disable-next-line */
+@tailwind components;
+/* stylelint-disable-next-line */
+@tailwind utilities;
+
+/* App-wide base styles */
+:root {
+	color-scheme: dark;
+}
+
+html, body, #root {
+	height: 100%;
+}
+
+body {
+	background: linear-gradient(to bottom, #0a0e14, #0b0f17, #0e121a);
+	color: #ffffff;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle glow utility */
+.soft-glow {
+	box-shadow: 0 0 30px rgba(99,102,241,0.2), 0 0 60px rgba(56,189,248,0.15);
+}

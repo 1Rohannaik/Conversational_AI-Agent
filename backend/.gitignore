@@ -1,0 +1,86 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Logs
+*.log
+*.out
+*.err
+
+# Database
+*.sqlite3
+*.db
+*.db-journal
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.*.local
+
+# Cloud / uploaded files
+uploads/
+*.pdf
+
+# Chroma / vectorstore persistence
+chroma_db/
+
+# MacOS
+.DS_Store
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Coverage
+.coverage
+htmlcov/
+.tox/
+
+# Python profiler
+.prof
+
+# Celery
+celerybeat-schedule
