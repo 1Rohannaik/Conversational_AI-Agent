@@ -1,132 +1,153 @@
-# AI Appointment Reminder System
+# Gemini Voice RAG Backend
 
-This backend scaffolds a production-ready, async voice agent that calls patients to confirm or reschedule appointments, integrates with your existing STT/TTS services, and persists progress with checkpoints.
+Hybrid Retrieval-Augmented Generation (RAG) + Generative Reasoning backend that powers a voice-first assistant. It understands uploaded PDFs (RAG), conducts dynamic AI interviews tailored to the document, answers factual questions, and summarizes content. Built with FastAPI, LangGraph, ChromaDB, Groq Whisper STT, and gTTS.
 
-## Components
-- Orchestrator: `backend/orchestrator/runner.py` (FastAPI, Twilio webhooks)
-- STT: `backend/stt_services/app.py` (already present)
-- TTS: `backend/tts_service/app.py` (already present)
-- DB models: `backend/db/models.py`, session: `backend/db/session.py`
-- Workflow: `backend/workflow/langgraph.json`
-- Intent detection: `backend/orchestrator/intents.py`
-- RAG template: `backend/rag/async_retriever.py`
-- Queue: `backend/queue/celery_app.py`
-- Prompts: `backend/prompts/system_prompt.txt`
+## Key Features
 
-## Quick start (dev)
-1. Create and activate a virtual environment, then install deps:
+- Hybrid RAG + Generative Interview
+  - Phase 1: RAG-based document analysis (skills, experience, projects)
+  - Phase 2: Generative, context-aware interview questions (one at a time)
+  - Follow-ups with feedback and progressive difficulty
+- RAG Q&A: Ask factual questions grounded in your uploaded PDF(s)
+- Summarization: Structured summaries with headings and bullet points
+- Robust error handling: Graceful fallbacks when Gemini API rate limits (429) occur
+- Modular architecture: Clean separation across small focused modules
 
-```zsh
-python3 -m venv backend/venv
-source backend/venv/bin/activate
-pip install -r backend/requirements.txt
+## Architecture (services/)
+
+- `orchestrator.py` – Conversation flow controller (LangGraph)
+- `intent_classifier.py` – Keyword-based routing (interview/continue/end/summary/rag)
+- `document_analyzer.py` – RAG utilities (retriever + analysis)
+- `interview_engine.py` – Hybrid interview logic (RAG + generative)
+- `summary_engine.py` – Summarization engine
+- `flow_manager.py` – Flow adapter layer
+- `rag_pipeline.py` – RetrievalQA with rate-limit aware fallbacks
+- `llm.py` – Gemini client factory
+
+## API Endpoints
+
+- POST `/upload/upload_pdf/` – Upload a PDF; stores Cloudinary URL and creates embeddings
+- POST `/flow/ask` – Single unified endpoint for interview/summary/rag flows
+- POST `/api/v1/stt` – Speech-to-text (Groq Whisper)
+- POST `/api/v1/tts` – Text-to-speech (gTTS)
+- GET `/` – Health status
+
+### Flow: /flow/ask
+
+Start a document-aware interview:
+
+```json
+POST /flow/ask
+{
+  "file_id": 12,
+  "question": "interview me based on my resume"
+}
 ```
 
-2. Set environment variables (copy `.env.example` then edit):
+Continue the interview (send user's answer and session ID from previous response):
 
-```zsh
-cp backend/.env.example backend/.env
-# Edit backend/.env with your values
-export DATABASE_URL="sqlite+aiosqlite:///./backend/dev.db"
-export TTS_BASE_URL="http://localhost:8001"   # your TTS service
-export STT_BASE_URL="http://localhost:8002"   # your STT service
-export PUBLIC_BASE_URL="http://localhost:8000"
-export TWILIO_ACCOUNT_SID="AC..."
-export TWILIO_AUTH_TOKEN="..."
-export TWILIO_FROM_NUMBER="+1..."
-export REDIS_URL="redis://localhost:6379/0"
+```json
+POST /flow/ask
+{
+  "file_id": 12,
+  "question": "I optimized a Django app by caching ORM-heavy endpoints…",
+  "conversation_session_id": "a1b2c3d4"
+}
 ```
 
-3. Run services in separate terminals:
+End the interview:
 
-- TTS:
-```zsh
-uvicorn backend.tts_service.app:app --host 0.0.0.0 --port 8001 --reload
-```
-- STT:
-```zsh
-uvicorn backend.stt_services.app:app --host 0.0.0.0 --port 8002 --reload
-```
-- Orchestrator:
-```zsh
-uvicorn backend.orchestrator.runner:app --host 0.0.0.0 --port 8000 --reload
-```
-- Celery worker (optional queue):
-```zsh
-celery -A backend.queue.celery_app.celery_app worker --loglevel=info
+```json
+POST /flow/ask
+{
+  "file_id": 12,
+  "question": "end interview",
+  "conversation_session_id": "a1b2c3d4"
+}
 ```
 
-4. Seed a patient (SQLite):
+Ask a factual question (RAG):
 
-```zsh
-python - <<'PY'
-import asyncio
-from datetime import datetime, timedelta
-from backend.db.session import engine, AsyncSessionLocal
-from backend.db.models import Base, Patient
-
-async def main():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    async with AsyncSessionLocal() as s:
-        p = Patient(name="John Doe", phone_e164="+15551234567",
-                    last_visit=datetime.utcnow()-timedelta(days=45),
-                    last_illness="flu", next_appointment=datetime.utcnow()+timedelta(days=2))
-        s.add(p)
-        await s.commit()
-
-asyncio.run(main())
-PY
+```json
+POST /flow/ask
+{
+  "file_id": 12,
+  "question": "What databases are mentioned in the document?"
+}
 ```
 
-4b. Alternatively, import from CSV:
+Generate a summary:
 
-```zsh
-python -m backend.tools.import_patients backend/tools/patients.sample.csv
+```json
+POST /flow/ask
+{
+  "file_id": 12,
+  "question": "Give me a summary"
+}
 ```
 
-CSV columns (required: name, phone_e164):
-- name: Patient full name
-- phone_e164: E.164 format number, e.g., +15551234567
-- last_visit: optional date/time (e.g., 2025-09-01 or 2025-09-01 10:00:00)
-- last_illness: optional text
-- next_appointment: optional date/time (same formats)
-- opt_out: true/false
+## Quick Start (macOS/zsh)
 
-5. Start a call (simulate):
+1) Create venv and install dependencies
 
 ```zsh
-curl -s -X POST http://localhost:8000/orchestrator/start \
-  -H 'Content-Type: application/json' \
-  -d '{"patient_id": 1}' | jq
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Twilio will hit `/orchestrator/voice/answer` and the flow proceeds via `<Gather input="speech">`.
+2) Configure environment variables (`backend/.env`)
 
-## Notes
-- Replace Chroma with Qdrant/Pinecone in `backend/rag/async_retriever.py` for production and add proper async LLM calls.
-- Add encryption at rest (pgcrypto or application-level) for PII if using Postgres.
-- Enforce call-time windows and audit logging in orchestrator before placing calls.
+```env
+# LLM
+GOOGLE_API_KEY=your_google_api_key
+
+# Speech-to-Text (Groq Whisper)
+GROQ_API_KEY=your_groq_api_key
+
+# Cloudinary (for PDF storage)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+```
+
+3) Run the API
+
+```zsh
+uvicorn main:app --reload
+```
+
+## Request/Response Examples
+
+Response from `/flow/ask` starting an interview:
+
+```json
+{
+  "intent": "interview",
+  "answer": "Perfect! I've analyzed your document... Please share your thoughts and reasoning.",
+  "conversation_session_id": "a1b2c3d4",
+  "requires_response": true,
+  "conversation_state": "active_interview"
+}
+```
+
+Continuation responses will keep `conversation_session_id` and may include brief feedback plus the next question.
+
+## Notes & Troubleshooting
+
+- Gemini 429 quota exceeded: The system detects rate-limit errors and returns helpful fallbacks (generic but relevant interview questions, or guidance to retry later for summaries/RAG)
+- STT formats: Accepts common audio types (wav/webm/mp3/m4a)
+- Vector DB: Uses local ChromaDB; no extra services required
 
 ## Dependency compatibility: Gemini packages
-This project uses `langchain-google-genai` (via LangChain) to access Gemini models. You don't need the standalone `google-generativeai` SDK. Installing both can lead to version conflicts around `google-ai-generativelanguage`.
 
-If you see a warning like:
-
-```
-google-generativeai 0.8.x requires google-ai-generativelanguage==0.6.10, but you have 0.6.18 which is incompatible.
-```
-
-Resolution (recommended):
-- Remove `google-generativeai` from your environment and keep `langchain-google-genai` only.
-
-Commands (from repo root):
+This project uses `langchain-google-genai` via LangChain. Avoid installing `google-generativeai` alongside it in the same env to prevent `google-ai-generativelanguage` version conflicts. If you must, isolate in a separate venv.
 
 ```zsh
-source backend/venv/bin/activate
+source venv/bin/activate
 pip uninstall -y google-generativeai
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 ```
 
-If you explicitly need the `google-generativeai` SDK in your own code, avoid installing `langchain-google-genai` at the same time to prevent resolver conflicts, or isolate it in a separate virtual environment.
 
