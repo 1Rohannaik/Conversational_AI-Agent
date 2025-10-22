@@ -16,3 +16,13 @@ def get_gemini_llm(model: str = "gemini-flash-latest", temperature: float = 0.2)
         api_key=get_google_api_key(), 
         temperature=temperature
     )
+
+
+def get_llm_response(prompt: str, temperature: float = 0.1) -> str:
+    """Get a simple LLM response for intent detection and quick queries."""
+    try:
+        llm = get_gemini_llm(temperature=temperature)
+        response = llm.invoke(prompt)
+        return response.content if hasattr(response, 'content') else str(response)
+    except Exception as e:
+        raise RuntimeError(f"LLM request failed: {e}")
