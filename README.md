@@ -28,12 +28,11 @@ Backend (FastAPI):
 
 Services (modular):
 
-- `orchestrator.py` – LangGraph controller
+- `orchestrator.py` – Simple controller (no LangGraph)
 - `intent_classifier.py` – Keyword routing (interview/continue/end/summary/rag)
 - `document_analyzer.py` – RAG helpers (retriever + analysis)
 - `interview_engine.py` – Hybrid interview generation
 - `summary_engine.py` – Structured document summaries
-- `flow_manager.py` – Flow execution adapter
 - `rag_pipeline.py` – RetrievalQA with rate‑limit aware fallbacks
 
 Frontend (React + Vite):
@@ -76,6 +75,14 @@ uvicorn main:app --reload
 cd frontend
 npm install
 npm run dev
+```
+
+Optional frontend env (create `frontend/.env.local`):
+
+```env
+VITE_BACKEND_URL=http://localhost:8000
+# Increase if large PDFs or slow networks cause timeouts (ms)
+VITE_UPLOAD_TIMEOUT_MS=120000
 ```
 
 Access:

@@ -13,7 +13,7 @@ export default function Orb({ state = 'idle', loudness = 0 }) {
   const scale = useTransform(loudSpring, [0, 1], [1, 1.16])
 
   const baseClasses =
-    'relative size-52 sm:size-60 md:size-64 rounded-full bg-gradient-to-br from-sky-400/60 via-indigo-400/60 to-fuchsia-400/50 backdrop-blur-[2px] border border-white/10'
+    'relative size-52 sm:size-60 md:size-64 rounded-full bg-gradient-to-br from-sky-500/50 via-blue-500/60 to-cyan-500/50 border border-white/10'
 
   const idleRing = (
     <div className="absolute inset-0 rounded-full animate-pulseGlow" aria-hidden />
@@ -29,17 +29,21 @@ export default function Orb({ state = 'idle', loudness = 0 }) {
     <motion.div
       className={baseClasses}
       style={{
-        boxShadow:
-          'inset 0 0 60px rgba(255,255,255,0.06), 0 0 120px rgba(99,102,241,0.25)',
+        boxShadow: '0 0 120px rgba(14,165,233,0.35)',
       }}
       animate={{
         background: [
-          'radial-gradient(60% 60% at 50% 40%, rgba(56,189,248,0.25), rgba(99,102,241,0.15) 70%, rgba(217,70,239,0.07))',
-          'radial-gradient(60% 60% at 50% 60%, rgba(99,102,241,0.25), rgba(56,189,248,0.15) 70%, rgba(217,70,239,0.09))',
+          'radial-gradient(circle at 50% 50%, rgba(14,165,233,0.25), rgba(56,189,248,0.15) 60%, rgba(6,182,212,0.05) 100%)',
+          'radial-gradient(circle at 50% 50%, rgba(56,189,248,0.25), rgba(14,165,233,0.15) 60%, rgba(6,182,212,0.05) 100%)',
         ],
-        filter: state === 'speaking' ? 'brightness(1.12)' : 'brightness(1)',
+        filter: state === 'speaking' ? 'brightness(1.25)' : 'brightness(1)',
+        scale: state === 'speaking' ? [1, 1.05, 1] : 1,
       }}
-      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ 
+        duration: state === 'speaking' ? 1.5 : 3, 
+        repeat: Infinity, 
+        ease: 'easeInOut' 
+      }}
     >
       {state === 'idle' && idleRing}
       {state === 'listening' && listeningRing}
@@ -47,8 +51,19 @@ export default function Orb({ state = 'idle', loudness = 0 }) {
 
       {/* Volume-reactive inner core */}
       <motion.div
-        className="absolute inset-5 sm:inset-6 md:inset-7 rounded-full bg-gradient-to-br from-white/30 via-white/15 to-transparent"
-        style={{ scale }}
+        className="absolute inset-5 sm:inset-6 md:inset-7 rounded-full"
+        style={{ 
+          scale,
+          background: 'radial-gradient(circle, rgba(56,189,248,0.3) 0%, rgba(14,165,233,0.2) 50%, transparent 100%)'
+        }}
+        animate={{
+          opacity: state === 'speaking' ? [0.6, 1, 0.6] : 1,
+        }}
+        transition={{ 
+          duration: state === 'speaking' ? 1 : 2, 
+          repeat: Infinity, 
+          ease: 'easeInOut' 
+        }}
       />
 
       {/* Galaxy dots when active */}
@@ -57,7 +72,7 @@ export default function Orb({ state = 'idle', loudness = 0 }) {
       {/* Ripples for subtle motion */}
       <div className="absolute inset-0" aria-hidden>
         <div className="absolute inset-[-8%] rounded-full border border-sky-300/10 animate-ripple" />
-        <div className="absolute inset-[-16%] rounded-full border border-indigo-300/10 animate-ripple [animation-delay:.6s]" />
+        <div className="absolute inset-[-16%] rounded-full border border-cyan-300/10 animate-ripple [animation-delay:.6s]" />
       </div>
     </motion.div>
   )

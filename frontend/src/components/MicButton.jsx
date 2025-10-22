@@ -2,9 +2,9 @@ export default function MicButton({ active = false, thinking = false, onPress })
   const getButtonStyle = () => {
     if (thinking) {
       return {
-        bg: 'bg-gradient-to-br from-purple-500/30 via-purple-600/20 to-indigo-500/25 hover:from-purple-500/40 hover:via-purple-600/30 hover:to-indigo-500/35',
-        border: 'border-purple-400/60 shadow-lg shadow-purple-500/20',
-        ring: 'ring-2 ring-purple-400/50 ring-offset-2 ring-offset-purple-900/20'
+        bg: 'bg-gradient-to-br from-blue-500/30 via-sky-600/20 to-cyan-500/25 hover:from-blue-500/40 hover:via-sky-600/30 hover:to-cyan-500/35',
+        border: 'border-blue-400/60 shadow-lg shadow-blue-500/20',
+        ring: 'ring-2 ring-blue-400/50 ring-offset-2 ring-offset-blue-900/20'
       }
     }
     if (active) {
@@ -15,22 +15,22 @@ export default function MicButton({ active = false, thinking = false, onPress })
       }
     }
     return {
-      bg: 'bg-gradient-to-br from-blue-500/25 via-blue-600/15 to-cyan-500/20 hover:from-blue-500/35 hover:via-blue-600/25 hover:to-cyan-500/30',
-      border: 'border-blue-400/50 shadow-md shadow-blue-500/15',
-      ring: 'hover:ring-1 hover:ring-blue-400/30'
+      bg: 'bg-gradient-to-br from-sky-500/25 via-blue-600/15 to-cyan-500/20 hover:from-sky-500/35 hover:via-blue-600/25 hover:to-cyan-500/30',
+      border: 'border-sky-400/50 shadow-md shadow-sky-500/15',
+      ring: 'hover:ring-1 hover:ring-sky-400/30'
     }
   }
 
   const getMicColor = () => {
-    if (thinking) return 'fill-purple-300 drop-shadow-sm'
+    if (thinking) return 'fill-blue-300 drop-shadow-sm'
     if (active) return 'fill-red-300 drop-shadow-sm'
-    return 'fill-blue-300 group-hover:fill-blue-200 drop-shadow-sm'
+    return 'fill-sky-300 group-hover:fill-sky-200 drop-shadow-sm'
   }
 
   const getMicSecondaryColor = () => {
-    if (thinking) return 'fill-purple-200/90'
+    if (thinking) return 'fill-blue-200/90'
     if (active) return 'fill-red-200/90'
-    return 'fill-blue-200/80 group-hover:fill-blue-100/90'
+    return 'fill-sky-200/80 group-hover:fill-sky-100/90'
   }
 
   const style = getButtonStyle()
@@ -54,9 +54,9 @@ export default function MicButton({ active = false, thinking = false, onPress })
     >
       {/* Background glow effect */}
       <div className={`absolute inset-0 rounded-full blur-xl opacity-30 transition-all duration-500 ${
-        thinking ? 'bg-purple-400' : 
+        thinking ? 'bg-blue-400' : 
         active ? 'bg-red-400' : 
-        'bg-blue-400'
+        'bg-sky-400'
       }`} />
       
       {/* mic glyph */}
@@ -89,15 +89,15 @@ export default function MicButton({ active = false, thinking = false, onPress })
       
       {thinking && (
         <>
-          <span className="pointer-events-none absolute inset-0 rounded-full animate-spin bg-gradient-to-r from-purple-400/30 via-indigo-400/20 to-purple-400/30" style={{ animationDuration: '3s' }} />
-          <span className="pointer-events-none absolute inset-1 rounded-full animate-pulse bg-gradient-to-br from-purple-400/25 to-indigo-400/25" />
-          <span className="pointer-events-none absolute inset-2 rounded-full animate-ping bg-purple-400/15" style={{ animationDuration: '2s' }} />
+          <span className="pointer-events-none absolute inset-0 rounded-full animate-spin bg-gradient-to-r from-blue-400/30 via-sky-400/20 to-blue-400/30" style={{ animationDuration: '3s' }} />
+          <span className="pointer-events-none absolute inset-1 rounded-full animate-pulse bg-gradient-to-br from-blue-400/25 to-sky-400/25" />
+          <span className="pointer-events-none absolute inset-2 rounded-full animate-ping bg-blue-400/15" style={{ animationDuration: '2s' }} />
         </>
       )}
       
       {/* Idle state subtle effect */}
       {!active && !thinking && (
-        <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/5 to-cyan-400/5 group-hover:from-blue-400/15 group-hover:to-cyan-400/15 transition-all duration-300" />
+        <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-sky-400/5 to-cyan-400/5 group-hover:from-sky-400/15 group-hover:to-cyan-400/15 transition-all duration-300" />
       )}
     </button>
   )

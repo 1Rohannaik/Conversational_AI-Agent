@@ -15,12 +15,11 @@ Hybrid Retrieval-Augmented Generation (RAG) + Generative Reasoning backend that 
 
 ## Architecture (services/)
 
-- `orchestrator.py` – Conversation flow controller (LangGraph)
+- `orchestrator.py` – Simple conversation router (no LangGraph)
 - `intent_classifier.py` – Keyword-based routing (interview/continue/end/summary/rag)
 - `document_analyzer.py` – RAG utilities (retriever + analysis)
 - `interview_engine.py` – Hybrid interview logic (RAG + generative)
 - `summary_engine.py` – Summarization engine
-- `flow_manager.py` – Flow adapter layer
 - `rag_pipeline.py` – RetrievalQA with rate-limit aware fallbacks
 - `llm.py` – Gemini client factory
 

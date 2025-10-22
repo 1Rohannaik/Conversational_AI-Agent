@@ -102,11 +102,20 @@ export default function GalaxyDots({ active, intensity = 0 }) {
         const size = baseDot + depth * (active ? 2.2 : 1.6) + intensityNow * maxBoost
         const alpha = 0.25 + depth * 0.55 + intensityNow * 0.2
 
-        // warm glow like the reference
+        // professional blue cosmic glow
         ctx.beginPath()
-        ctx.fillStyle = `rgba(255, 234, 200, ${Math.min(0.95, alpha)})`
+        const blueColor = depth > 0.6 ? `rgba(14, 165, 233, ${Math.min(0.95, alpha)})` : `rgba(56, 189, 248, ${Math.min(0.8, alpha)})`
+        ctx.fillStyle = blueColor
         ctx.arc(px, py, size, 0, Math.PI * 2)
         ctx.fill()
+        
+        // Add a subtle outer glow for larger dots
+        if (size > 2) {
+          ctx.beginPath()
+          ctx.fillStyle = `rgba(186, 230, 253, ${Math.min(0.3, alpha * 0.5)})`
+          ctx.arc(px, py, size * 1.5, 0, Math.PI * 2)
+          ctx.fill()
+        }
       }
 
       rafRef.current = requestAnimationFrame(render)

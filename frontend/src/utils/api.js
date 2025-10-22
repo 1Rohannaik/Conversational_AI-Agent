@@ -1,6 +1,7 @@
 // Lightweight API client for the backend
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+const DEFAULT_UPLOAD_TIMEOUT_MS = Number(import.meta.env.VITE_UPLOAD_TIMEOUT_MS || 120000) // 2 minutes
 
 async function handleResponse(res) {
   const contentType = res.headers.get('content-type') || ''
@@ -41,27 +42,38 @@ export async function uploadPdf(file) {
   console.log('Uploading to:', url)
   console.log('Base URL:', getBaseUrl())
   
-  // Create AbortController for timeout
-  const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
-  
-  try {
-    console.log('Making fetch request...')
-    const res = await fetch(url, {
-      method: 'POST',
-      body: fd,
-      signal: controller.signal,
-    })
-    console.log('Response received:', res.status)
-    clearTimeout(timeoutId)
-    return handleResponse(res)
-  } catch (error) {
-    console.error('Upload error:', error)
-    clearTimeout(timeoutId)
-    if (error.name === 'AbortError') {
-      throw new Error('Upload timed out. Please try again.')
+  async function doUpload(timeoutMs) {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      console.log(`Making fetch request (timeout ${timeoutMs}ms)...`)
+      const res = await fetch(url, { method: 'POST', body: fd, signal: controller.signal })
+      console.log('Response received:', res.status)
+      clearTimeout(timeoutId)
+      return handleResponse(res)
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw error
     }
-    throw error
+  }
+
+  try {
+    // First attempt with default (configurable) timeout
+    return await doUpload(DEFAULT_UPLOAD_TIMEOUT_MS)
+  } catch (err) {
+    console.warn('Upload attempt 1 failed:', err?.name || err)
+    if (err?.name === 'AbortError') {
+      // One automatic retry with extended timeout
+      try {
+        return await doUpload(DEFAULT_UPLOAD_TIMEOUT_MS * 1.5)
+      } catch (err2) {
+        if (err2?.name === 'AbortError') {
+          throw new Error('Upload timed out. Please try again or try a smaller PDF.')
+        }
+        throw err2
+      }
+    }
+    throw err
   }
 }
 
